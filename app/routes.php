@@ -11,11 +11,17 @@
 
 $router = app()->module('router');
 
-$router->map('home', '/', function() {
-	echo 'index<br>';
-});
+
+// Rotas da página principal
+$router->map('index', '/', array('App\Controller\HomeController', 'index'));
+
+
+// Rotas da página de login
+$router->map('login', '/entrar', array('App\Controller\HomeController', 'login'));
+
+$router->map('login.submit', '/entrar', array('App\Controller\HomeController', 'loginSubmit'), 'POST');
+
 
 unset($router);
-
 
 ?>

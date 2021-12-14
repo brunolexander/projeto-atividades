@@ -1,12 +1,13 @@
 CREATE DATABASE IF NOT EXISTS `projeto-atividades` DEFAULT CHARACTER SET=`utf8mb4` COLLATE `utf8mb4_unicode_520_ci`;
 USE `projeto-atividades`;
 
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE IF NOT EXISTS `usuarios` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
-	`nome` VARCHAR(255) NOT NULL,
+	`nome` VARCHAR(255),
 	`email` VARCHAR(255) NOT NULL,
 	`senha` VARCHAR(255) NOT NULL,
 	`criado_em` INT(11) NOT NULL,
+	`acesso_em` INT(11),
 	`permissao` INT(11) DEFAULT 1,
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB;

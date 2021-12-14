@@ -13,7 +13,9 @@ return array(
 		'hostname' => 'localhost',
 		'username' => 'root',
 		'password' => '',
-		'database' => 'projeto-atividades'
+		'database' => 'projeto-atividades',
+		'port' => 3306,
+		'socket' => null
 	],
 
 	# Fuso horário 

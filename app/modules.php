@@ -20,8 +20,36 @@
 
 $app = app();
 
+
+// Router
 $app->module(['router' => new App\Modules\Router()]);
 
+
+// View
+$app->module(['view' => new App\Modules\View()]);
+
+
+// Banco de dados
+$config = $app->config('database');
+
+$database = new \mysqli(
+	$config['hostname'],
+	$config['username'],
+	$config['password'],
+	$config['database'],
+	$config['port'],
+	$config['socket']	
+);
+
+$app->module(['database' => $database]);
+
+register_shutdown_function(function() use($database) {
+	$database->close();
+});
+
+
+unset($config);
+unset($database);
 unset($app);
 
 ?>

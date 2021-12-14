@@ -111,6 +111,16 @@ class Application
 
 		$this->configs = array_merge($this->configs, $option);
 	}
+
+	/**
+	 * Retorna o caminho para o diretório de arquivos da View. 
+	 * 
+	 * @return string
+	 */
+	public function getViewDir()
+	{
+		return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'view';
+	}
 }
 
 
