@@ -29,6 +29,10 @@ $app->module(['router' => new App\Modules\Router()]);
 $app->module(['view' => new App\Modules\View()]);
 
 
+// Session
+$app->module(['session' => new App\Modules\Session()]);
+
+
 // Banco de dados
 $config = $app->config('database');
 

@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Controller;
-use App\Services\AuthService as AuthService;
-use App\Collection\UserCollection as UserCollection;
 
-class HomeController
+use App\Modules\Controller;
+use App\Services\AuthService;
+
+class HomeController extends Controller
 {
-	protected $users;
+	protected $services;
 
 	protected $auth;
 
@@ -16,47 +17,37 @@ class HomeController
 	 * 
 	 * Por hora, instanciamos no próprio construtor.
 	 */
-	public function __construct(UserCollection $users=null, AuthService $auth=null)
+	public function __construct(AuthService $auth=null)
 	{
-		$this->users = new UserCollection;
-		$this->auth = new AuthService;
+		$connection = app()->module('database');
+
+		$this->services = (object) [
+			'auth' => new AuthService()
+		];
 	}
 
 	public function index()
 	{
-		if (!$this->auth->isSignedIn())
+		if ($this->services->auth->isSignedIn())
+		{
+			app()->module('view')->load('index');
+		}
+		else
 		{
 			app()->module('router')->redirect('login');
-
-			return;
 		}
-		
-		app()->module('view')->load('index');
 	}
 
 	public function login()
 	{
-		if ($this->auth->isSignedIn())
+		if ($this->services->auth->isSignedIn())
 		{
 			app()->module('router')->redirect('index');
-
-			return;
 		}
-
-		$data = array('error' => '', 'email' => '');
-
-		if (isset($_SESSION['error']))
+		else
 		{
-			$data['error'] = htmlspecialchars($_SESSION['error']);
-			unset($_SESSION['error']);
+			app()->module('view')->load('login');
 		}
-
-		if (isset($_SESSION['email']))
-		{
-			$data['email'] = filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL);
-		}
-
-		app()->module('view')->load('login', $data);
 	}
 
 	public function loginSubmit()
@@ -64,23 +55,22 @@ class HomeController
 		$email = filter_input(INPUT_POST, 'email');
 		$password = filter_input(INPUT_POST, 'password');
 
-		$user = $this->users->findByLogin($email, $password);
+		app()->module('session')->set('email', $email);
 
-		if ($user)
+		if ($this->services->auth->passwordSignIn($email, $password))
 		{
-			$this->auth->signIn($user);
 			app()->module('router')->redirect('index');
 		}
-
-		$_SESSION['error'] = 'Usuário e/ou senha inválido(s)';
-		$_SESSION['email'] = $email;
-	
-		app()->module('router')->redirect('login');
+		else
+		{
+			app()->module('session')->flash('error', 'Usuário e/ou senha inválido(s)');
+			app()->module('router')->redirect('login');
+		}
 	}
 
-	public function logoutSubmit()
+	public function logout()
 	{
-		$this->auth->signOut();
+		$this->services->auth->signOut();
 		app()->module('router')->redirect('login');
 	}
 }

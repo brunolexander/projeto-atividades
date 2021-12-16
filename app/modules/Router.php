@@ -15,6 +15,13 @@ class Router
 	protected $routes = array();
 
 	/**
+	 * Nome da rota atual.
+	 * 
+	 * @var string
+	 */
+	protected $current;
+
+	/**
 	 * Manipula uma solicitação.
 	 * 
 	 * @param string $path 				Caminho URI da solicitação
@@ -43,37 +50,28 @@ class Router
 				continue;
 			}
 
+			list($object, $method) = $route['callback'];
+
+			if (!is_object($object))
+			{
+				$object = new $object;
+			}
+
+			if ($object->run($name) == false)
+			{
+				continue;
+			}
+
+			$this->current = $name;
+
 			$args = array_column($matches, 0);
 
 			// $args[] contém os valores dos parâmetros entre chaves { }
 			// não precisamos do primeiro item pois $args[0] === $path
 			unset($args[0]);
 
-			if (is_array($route['callback']))
-			{
-				list($object, $method) = $route['callback'];
-
-				$reflection = new \ReflectionMethod($object, $method);
-
-				if ($reflection->isStatic())
-				{
-					$object::$method(...$args);
-				}
-				else
-				{
-					if (!is_object($object))
-					{
-						$object = new $object;
-					}
-
-					$object->$method(...$args);
-				}
-			}
-			else
-			{
-				$route['callback'](...$args);
-			}
-
+			$object->$method(...$args);
+	
 			break;
 		}
 	}
@@ -98,9 +96,11 @@ class Router
 	 */
 	public function map($name, $path, $callback, $request_method='GET')
 	{
-		if (!is_callable($callback))
+		list($object, $method) = $callback;
+
+		if (!method_exists($object, $method))
 		{
-			throw new \InvalidArgumentException('map() espera que 3° parâmetro seja um callback válido');
+			throw new \InvalidArgumentException('map() espera que 3° parâmetro seja uma classe ou objeto com um método válido');
 		}
 
 		$this->routes[$name] = array(

@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 	`criado_em` INT(11) NOT NULL,
 	`acesso_em` INT(11),
 	`permissao` INT(11) DEFAULT 1,
-	PRIMARY KEY(`id`)
+	`session_hash` VARCHAR(255),
+	PRIMARY KEY(`id`),
+	UNIQUE(`email`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `categorias` (
@@ -24,10 +26,10 @@ CREATE TABLE IF NOT EXISTS `atividades` (
 	`descricao` TEXT,
 	`criado_em` INT(11) NOT NULL,
 	`atualizado_em` INT(11) DEFAULT NULL,
-	`expira_em` INT(11) NOT NULL,
-	`categoria` INT(11) NOT NULL,
+	`finalizada` INT(11) DEFAULT 0,
+	`categoria` INT(11),
 	`autor` INT(11) NOT NULL,
 	PRIMARY KEY(`id`),
-	FOREIGN KEY (`categoria`) REFERENCES `categorias`(`id`),
-	FOREIGN KEY (`autor`) REFERENCES `users`(`id`)
+	FOREIGN KEY (`categoria`) REFERENCES `categorias`(`id`) ON DELETE SET NULL,
+	FOREIGN KEY (`autor`) REFERENCES `usuarios`(`id`)
 ) ENGINE=InnoDB;
