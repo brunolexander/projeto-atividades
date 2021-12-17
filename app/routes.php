@@ -55,6 +55,10 @@ $router->map('category.store', '/categorias/criar', array('App\Controller\Catego
 $router->map('category.destroy', '/categorias/destroy', array('App\Controller\CategoryController', 'destroy'), 'POST');
 
 
+// Rota para página de 404 Not Found
+$router->mapHttpResponseCode(404, ['App\Controller\ErrorController', 'notFound']);
+
+
 unset($router);
 
 ?>

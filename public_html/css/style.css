@@ -486,3 +486,24 @@ html {
 .text--pending {
 	color: red;
 }
+
+.notfound {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	flex-grow: 1;
+	background-color: #ececec;
+}
+
+.notfound__title {
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: 4em;
+}
+
+.notfound__heading {
+	margin-top: 0;
+	margin-bottom: 10px;
+	font-size: 1.1em;
+}

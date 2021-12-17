@@ -275,7 +275,7 @@ class UserService
 	 */
 	public function findByEmail($email)
 	{
-		$stmt = $this->connection->prepare('SELECT *, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor WHERE `email`=?');
+		$stmt = $this->connection->prepare('SELECT usuario.*, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor WHERE `email`=?');
 
 		if (!$stmt)
 		{
@@ -319,7 +319,7 @@ class UserService
 	 */
 	public function findById($id)
 	{
-		$stmt = $this->connection->prepare('SELECT *, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor WHERE usuario.id=?');
+		$stmt = $this->connection->prepare('SELECT usuario.*, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor WHERE usuario.id=?');
 
 		if (!$stmt)
 		{

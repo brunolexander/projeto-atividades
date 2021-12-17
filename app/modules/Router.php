@@ -15,6 +15,13 @@ class Router
 	protected $routes = array();
 
 	/**
+	 * Rotas para códigos de HTTP
+	 * 
+	 * @var array 
+	 */
+	protected $http_routes = array();
+
+	/**
 	 * Nome da rota atual.
 	 * 
 	 * @var string
@@ -22,7 +29,7 @@ class Router
 	protected $current;
 
 	/**
-	 * Manipula uma solicitação.
+	 * Manipula solicitações e códigos de status HTTP.
 	 * 
 	 * @param string $path 				Caminho URI da solicitação
 	 * @param string $request_method 	Método da solicitação, como GET ou POST
@@ -30,6 +37,23 @@ class Router
 	 * @return void
 	 */
 	public function handle($path, $request_method=null)
+	{
+		// Manipular a solicitação
+		$this->handleRequest($path, $request_method);
+
+		// Manipular qualquer código de status HTTP
+		$this->handleHttpResponseCode();
+	}
+
+	/**
+	 * Manipula uma solicitação URI. Caso inválido, retorna HTTP 404.
+	 * 
+	 * @param string $path 				Caminho URI da solicitação
+	 * @param string $request_method 	Método da solicitação, como GET ou POST
+	 * 									Caso nulo, obtem da váriavel $_SERVER
+	 * @return bool
+	 */
+	public function handleRequest($path, $request_method)
 	{
 		if (is_null($request_method))
 		{
@@ -72,8 +96,46 @@ class Router
 
 			$object->$method(...$args);
 	
-			break;
+			return true;
 		}
+
+		http_response_code(404);
+
+		return false;
+	}
+
+	/**
+	 * Manipula um código de status HTTP
+	 * 
+	 * @param int $code 	Código do status
+	 *						Para uma lista completa dos códigos, consulte:
+	 * 						https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+	 * 
+	 * @return bool
+	 */
+	public function handleHttpResponseCode($code=null)
+	{
+		if ($code === null)
+		{
+			$code = http_response_code();
+		}
+
+		if (!array_key_exists($code, $this->http_routes))
+		{
+			return false;
+		}
+
+		$object = $this->http_routes[$code]['controller'];
+		$method = $this->http_routes[$code]['method'];
+
+		if (!is_object($object))
+		{
+			$object = new $object();
+		}
+
+		$object->$method();
+
+		return true;
 	}
 
 	/**
@@ -108,6 +170,31 @@ class Router
 			'callback' => $callback,
 			'request_method' => $request_method
 		);
+	}
+
+	/**
+	 * Mapeia uma rota para manipular erros de HTTP, por exemplo, 404 Not Found.
+	 * 
+	 * @param int $code 	Código do status
+	 * 						Para uma lista completa dos errors, consulte:
+	 * 						https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+	 * 
+	 * @param array $controller 	Classe e método do controller
+	 * 
+	 */
+	public function mapHttpResponseCode($code, $controller)
+	{
+		list($object, $method) = $controller;
+
+		if (!method_exists($object, $method))
+		{
+			throw new \InvalidArgumentException('map() espera que 2° parâmetro seja uma classe ou objeto com um método válido');
+		}
+
+		$this->http_routes[$code] = [
+			'controller' => $object,
+			'method' => $method
+		];
 	}
 
 	/**

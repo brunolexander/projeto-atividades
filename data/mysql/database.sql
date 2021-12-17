@@ -33,3 +33,8 @@ CREATE TABLE IF NOT EXISTS `atividades` (
 	FOREIGN KEY (`categoria`) REFERENCES `categorias`(`id`) ON DELETE SET NULL,
 	FOREIGN KEY (`autor`) REFERENCES `usuarios`(`id`)
 ) ENGINE=InnoDB;
+
+
+INSERT INTO `usuarios` (`email`, `senha`, `criado_em`) VALUES ('admin@admin.com', '$2y$10$gnmhc423zva8TPto9fx9lu7cz5M41Oazu7x9taGVp19otWeMUy2Um', UNIX_TIMESTAMP());
+
+INSERT INTO `categorias` (`nome`) VALUES ('Desenvolvimento'), ('Atendimento'), ('Manutenção'), ('Manutenção urgente');

@@ -11,11 +11,16 @@ function app()
 	return App\Modules\Application::instance();
 }
 
-
 /**
  * Carrega as configurações
  */
 require __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
+
+
+/**
+ * Prepara o manipulador de erros e exceções
+ */
+require __DIR__ . DIRECTORY_SEPARATOR . 'error_handler.php';
 
 
 /**

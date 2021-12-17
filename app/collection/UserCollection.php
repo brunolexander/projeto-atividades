@@ -19,7 +19,7 @@ class UserCollection
 	 */
 	public function getAll()
 	{
-		$stmt = $this->connection->prepare('SELECT *, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor ORDER BY COALESCE(`nome`, `email`) ASC;');
+		$stmt = $this->connection->prepare('SELECT usuario.*, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor ORDER BY COALESCE(`nome`, `email`) ASC;');
 		
 		if (!$stmt)
 		{
