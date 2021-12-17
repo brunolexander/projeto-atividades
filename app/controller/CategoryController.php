@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Modules\Controller;
 use App\Services\AuthService;
 use App\Services\CategoryService;
+use App\Services\UserService;
 use App\Collection\CategoryCollection;
 use App\Model\Category;
 
@@ -30,7 +31,8 @@ class CategoryController
 
 		$this->services = (object) [
 			'category' => new $category($connection, $this->collection->category),
-			'auth' => new $auth()
+			'auth' => new $auth(),
+			'user' => new UserService($connection)
 		];
 	}
 
@@ -54,6 +56,17 @@ class CategoryController
 
 	public function store()
 	{
+		$user = $this->services->user->findById($this->services->auth->getCurrentUserId());
+
+		if (!in_array('adicionar_categorias', $user->getPermission()))
+		{
+			app()->module('session')->flash('error', 'Você não possui permissões suficientes para adicionar categorias.');
+
+			app()->module('router')->redirect('category.index');
+
+			return;
+		}
+
 		$name = filter_input(INPUT_POST, 'name');
 
 		if (!$this->services->category->create($name))
@@ -70,6 +83,17 @@ class CategoryController
 
 	public function destroy()
 	{
+		$user = $this->services->user->findById($this->services->auth->getCurrentUserId());
+
+		if (!in_array('remover_categorias', $user->getPermission()))
+		{
+			app()->module('session')->flash('error', 'Você não possui permissões suficientes para remover categorias.');
+
+			app()->module('router')->redirect('category.index');
+
+			return;
+		}
+
 		$categories = filter_input_array(INPUT_POST, array(
 			'category' => array(
 				'filter' => FILTER_VALIDATE_INT,

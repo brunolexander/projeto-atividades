@@ -34,7 +34,46 @@ CREATE TABLE IF NOT EXISTS `atividades` (
 	FOREIGN KEY (`autor`) REFERENCES `usuarios`(`id`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `permissoes` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nome` VARCHAR(64) NOT NULL,
+	PRIMARY KEY (`id`)
+);
 
-INSERT INTO `usuarios` (`email`, `senha`, `criado_em`) VALUES ('admin@admin.com', '$2y$10$gnmhc423zva8TPto9fx9lu7cz5M41Oazu7x9taGVp19otWeMUy2Um', UNIX_TIMESTAMP());
+CREATE TABLE IF NOT EXISTS `permissoes_usuario` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`usuario_id` INT(11) NOT NULL,
+	`permissao_id` INT(11) NOT NULL,
+	PRIMARY KEY(`id`),
+	FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`permissao_id`) REFERENCES `permissoes` (`id`),
+	UNIQUE (`usuario_id`, `permissao_id`)
+);
+
+INSERT INTO `usuarios` (`id`, `email`, `senha`, `criado_em`) VALUES (1, 'admin@admin.com', '$2y$10$gnmhc423zva8TPto9fx9lu7cz5M41Oazu7x9taGVp19otWeMUy2Um', UNIX_TIMESTAMP());
 
 INSERT INTO `categorias` (`nome`) VALUES ('Desenvolvimento'), ('Atendimento'), ('Manutenção'), ('Manutenção urgente');
+
+INSERT INTO `permissoes` VALUES (1, 'ver_usuários');
+INSERT INTO `permissoes` VALUES (2, 'criar_usuários');
+INSERT INTO `permissoes` VALUES (3, 'editar_usuários');
+INSERT INTO `permissoes` VALUES (4, 'remover_usuários');
+INSERT INTO `permissoes` VALUES (5, 'ver_atividades');
+INSERT INTO `permissoes` VALUES (6, 'criar_atividades');
+INSERT INTO `permissoes` VALUES (7, 'editar_atividades');
+INSERT INTO `permissoes` VALUES (8, 'remover_atividades');
+INSERT INTO `permissoes` VALUES (9, 'finalizar_atividades');
+INSERT INTO `permissoes` VALUES (10, 'adicionar_categorias');
+INSERT INTO `permissoes` VALUES (11, 'remover_categorias');
+
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 1);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 2);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 3);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 4);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 5);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 6);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 7);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 8);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 9);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 10);
+INSERT INTO `permissoes_usuario` (`usuario_id`, `permissao_id`) VALUES (1, 11);

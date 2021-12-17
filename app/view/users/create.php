@@ -17,7 +17,7 @@
 		<div class="card__body">
 			<div class="form__group">
 				<label for="email">Email</label>
-				<input type="email" name="email" id="email" class="form__input" required>
+				<input type="email" name="email" id="email" class="form__input" value="<?= app()->module('session')->get('input_email'); ?>" required>
 			</div>
 
 			<div class="form__group">
@@ -36,36 +36,46 @@
 			<fieldset class="form__group">
 				<legend>Usuários</legend>
 
-				<input type="checkbox" name="permissions[]" value="view_users" id="view_users">
+				<input type="checkbox" name="permissions[]" value="ver_usuários" id="view_users">
 				<label for="view_users">Ver usuários</label>
 
-				<input type="checkbox" name="permissions[]" value="add_users" id="add_users">
+				<input type="checkbox" name="permissions[]" value="criar_usuários" id="add_users">
 				<label for="add_users">Criar usuários</label>
 
-				<input type="checkbox" name="permissions[]" value="edit_users" id="edit_users">
+				<input type="checkbox" name="permissions[]" value="editar_usuários" id="edit_users">
 				<label for="edit_users">Editar usuários</label>
 
-				<input type="checkbox" name="permissions[]" value="remove_users" id="remove_users">
+				<input type="checkbox" name="permissions[]" value="remover_usuários" id="remove_users">
 				<label for="remove_users">Remover usuários</label>
 			</fieldset>
 			
 			<fieldset class="form__group">
 				<legend>Atividades</legend>
 
-				<input type="checkbox" name="permissions[]" value="view_tasks" id="view_tasks" checked>
+				<input type="checkbox" name="permissions[]" value="ver_atividades" id="view_tasks" checked>
 				<label for="view_tasks">Ver atividades</label>
 
-				<input type="checkbox" name="permissions[]" value="add_tasks" id="add_tasks">
+				<input type="checkbox" name="permissions[]" value="criar_atividades" id="add_tasks">
 				<label for="add_tasks">Criar atividades</label>
 
-				<input type="checkbox" name="permissions[]" value="edit_tasks" id="edit_tasks">
+				<input type="checkbox" name="permissions[]" value="editar_atividades" id="edit_tasks">
 				<label for="edit_tasks">Editar atividades</label>
 
-				<input type="checkbox" name="permissions[]" value="remove_tasks" id="remove_tasks">
+				<input type="checkbox" name="permissions[]" value="remover_atividades" id="remove_tasks">
 				<label for="remove_tasks">Remover atividades</label>
 
-				<input type="checkbox" name="permissions[]" value="end_tasks" id="end_tasks">
+				<input type="checkbox" name="permissions[]" value="finalizar_atividades" id="end_tasks">
 				<label for="end_tasks">Finalizar atividades</label>
+			</fieldset>
+
+			<fieldset class="form__group">
+				<legend>Categorias</legend>
+
+				<input type="checkbox" name="permissions[]" value="adicionar_categorias" id="add_category">
+				<label for="add_category">Adicionar categorias</label>
+
+				<input type="checkbox" name="permissions[]" value="remover_categorias" id="remove_category">
+				<label for="remove_category">Remover categorias</label>
 			</fieldset>
 		</div>
 

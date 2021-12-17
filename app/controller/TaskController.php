@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Modules\Controller;
 use App\Services\AuthService;
 use App\Services\TaskService;
+use App\Services\UserService;
 use App\Services\CategoryService;
 use App\Collection\TaskCollection;
 use App\Collection\CategoryCollection;
@@ -32,11 +33,13 @@ class TaskController
 		$task_collection = new TaskCollection($connection);
 		$task_service = new TaskService($connection, $category_service);
 		$auth_service = new AuthService();
+		$user_service = new UserService($connection);
 
 		$this->services = (object) [
 			'task' => $task_service,
 			'auth' => $auth_service,
-			'category' => $category_service
+			'category' => $category_service,
+			'user' => $user_service
 		];
 
 		$this->collection = (object) [
@@ -59,6 +62,11 @@ class TaskController
 
 	public function index()
 	{
+		if (!$this->checkUserPermission('ver_atividades'))
+		{
+			return;
+		}
+
 		$tasks = $this->collection->task->getAll();
 
 		app()->module('view')->load('tasks/index', ['tasks' => $tasks]);
@@ -66,6 +74,11 @@ class TaskController
 
 	public function create()
 	{
+		if (!$this->checkUserPermission('criar_atividades'))
+		{
+			return;
+		}
+
 		$categories = $this->collection->category->getAll();
 
 		app()->module('view')->load('tasks/create', ['categories' => $categories]);
@@ -73,6 +86,11 @@ class TaskController
 
 	public function store()
 	{
+		if (!$this->checkUserPermission('criar_atividades'))
+		{
+			return;
+		}
+
 		$title = filter_input(INPUT_POST, 'title');
 		$content = filter_input(INPUT_POST, 'content');
 		$status = filter_input(INPUT_POST, 'status', FILTER_VALIDATE_INT);
@@ -113,6 +131,11 @@ class TaskController
 
 	public function edit($id)
 	{
+		if (!$this->checkUserPermission('editar_atividades'))
+		{
+			return;
+		}
+
 		$task = $this->services->task->findById($id);
 
 		if (!$task)
@@ -128,6 +151,11 @@ class TaskController
 
 	public function update($id)
 	{
+		if (!$this->checkUserPermission('editar_atividades'))
+		{
+			return;
+		}
+
 		$title = filter_input(INPUT_POST, 'title');
 		$content = filter_input(INPUT_POST, 'content');
 		$status = filter_input(INPUT_POST, 'status', FILTER_VALIDATE_INT);
@@ -163,6 +191,11 @@ class TaskController
 
 	public function destroy($id)
 	{
+		if (!$this->checkUserPermission('remover_atividades'))
+		{
+			return;
+		}
+
 		if ($this->services->task->delete($id))
 		{
 			app()->module('session')->flash('notify', $this->services->task->message);
@@ -175,6 +208,33 @@ class TaskController
 
 			app()->module('router')->redirect('tasks.edit', ['id' => $id]);
 		}
+	}
+
+	/**
+	 * Verifica se usuário atual possui permissão.
+	 * 
+	 * @param string $permission 		Permissão para verificar
+	 * @return bool
+	 */
+	protected function checkUserPermission($permission)
+	{
+		$user = $this->services->user->findById($this->services->auth->getCurrentUserId());
+
+		if (in_array($permission, $user->getPermission()))
+		{
+			return true;
+		}
+
+		// Caso o usuário não tenha a permissão, o redirecionamos
+		// à página principal do painel, com mensagem de erro
+
+		http_response_code(403);
+
+		app()->module('session')->flash('error', 'Você não possui permissões suficientes para acessar esta página.');
+
+		app()->module('router')->redirect('index');
+
+		return false;
 	}
 }
 

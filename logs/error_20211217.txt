@@ -1,0 +1,1 @@
+[18:40:32] Undefined property: App\Model\User::$get em C:\Program Files (x86)\EasyPHP-Devserver-17\eds-www\projeto-atividades\app\services\AuthService.php na linha 37; erro número 8[18:40:50] Undefined property: App\Model\User::$get em C:\Program Files (x86)\EasyPHP-Devserver-17\eds-www\projeto-atividades\app\services\AuthService.php na linha 37; erro número 8

@@ -85,6 +85,9 @@ class UserService
 		}
 		else
 		{
+			$user_id = $this->connection->insert_id;
+			$user->setId($user_id);
+			$this->setPermissions($user);
 			$this->message = 'Usuário adicionado com sucesso!';
 
 			$success = true;
@@ -275,7 +278,27 @@ class UserService
 	 */
 	public function findByEmail($email)
 	{
-		$stmt = $this->connection->prepare('SELECT usuario.*, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor WHERE `email`=?');
+		$query = <<<SQL
+
+		SELECT
+		    usuario.*,
+		    COUNT(DISTINCT atividade.id) AS total_atividades,
+		    GROUP_CONCAT(permissao.nome) AS permissoes
+		FROM
+		    `usuarios` usuario
+		LEFT JOIN `atividades` atividade ON
+		    usuario.id = atividade.autor
+		LEFT JOIN `permissoes_usuario` permissao_usuario ON
+		    usuario.id = permissao_usuario.usuario_id
+		LEFT JOIN `permissoes` permissao ON
+		    permissao_usuario.permissao_id = permissao.id
+		WHERE
+		    usuario.email = ?
+		GROUP BY
+			usuario.id;
+SQL;
+
+		$stmt = $this->connection->prepare($query);
 
 		if (!$stmt)
 		{
@@ -300,7 +323,7 @@ class UserService
 				$user->setName($row['nome']);
 				$user->setCreatedAt($row['criado_em']);
 				$user->setLastAccess($row['acesso_em']);
-				$user->setPermission($row['permissao']);
+				$user->setPermission(explode(',', $row['permissoes']));
 				$user->setNumTasksCreated($row['total_atividades']);
 			}
 
@@ -319,7 +342,27 @@ class UserService
 	 */
 	public function findById($id)
 	{
-		$stmt = $this->connection->prepare('SELECT usuario.*, COUNT(atividade.id) AS total_atividades FROM `usuarios` usuario LEFT JOIN `atividades` atividade ON usuario.id=atividade.autor WHERE usuario.id=?');
+		$query = <<<SQL
+
+		SELECT
+		    usuario.*,
+		    COUNT(DISTINCT atividade.id) AS total_atividades,
+		    GROUP_CONCAT(permissao.nome) AS permissoes
+		FROM
+		    `usuarios` usuario
+		LEFT JOIN `atividades` atividade ON
+		    usuario.id = atividade.autor
+		LEFT JOIN `permissoes_usuario` permissao_usuario ON
+		    usuario.id = permissao_usuario.usuario_id
+		LEFT JOIN `permissoes` permissao ON
+		    permissao_usuario.permissao_id = permissao.id
+		WHERE
+		    usuario.id = ?
+		GROUP BY
+			usuario.id;
+SQL;
+
+		$stmt = $this->connection->prepare($query);
 
 		if (!$stmt)
 		{
@@ -344,7 +387,7 @@ class UserService
 				$user->setName($row['nome']);
 				$user->setCreatedAt($row['criado_em']);
 				$user->setLastAccess($row['acesso_em']);
-				$user->setPermission($row['permissao']);
+				$user->setPermission(explode(',', $row['permissoes']));
 				$user->setNumTasksCreated($row['total_atividades']);
 			}
 
@@ -422,6 +465,50 @@ class UserService
 		$stmt->close();
 
 		return $success;
+	}
+
+	/**
+	 * Defini as permissões do usuário.
+	 * 
+	 * @param App\Model\User $user 		Usuário
+	 * @return bool
+	 */
+	public function setPermissions(User $user)
+	{
+		$query = <<<SQL
+
+		INSERT IGNORE
+		INTO
+		    `permissoes_usuario`(`usuario_id`, `permissao_id`)
+		SELECT
+		    usuario.id,
+		    permissao.id
+		FROM
+		    `usuarios` usuario
+		INNER JOIN `permissoes` permissao ON
+		    permissao.nome = ?
+		WHERE
+		    usuario.id = ?;
+SQL;
+
+		$stmt = $this->connection->prepare($query);
+
+		if (!$stmt)
+		{
+			return false;
+		}
+
+		$user_id = $user->getId();
+
+		foreach ($user->getPermission() as $permission)
+		{
+			$stmt->bind_param('si', $permission, $user_id);
+			$stmt->execute();
+		}
+
+		$stmt->close();
+
+		return true;
 	}
 }
 

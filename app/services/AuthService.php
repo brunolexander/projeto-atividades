@@ -91,8 +91,12 @@ class AuthService
 		unset($_SESSION['login']);
 		unset($_SESSION['user']);
 		unset($_SESSION['addr']);
+		unset($_SESSION['last_seen']);
 	}
 
+	/**
+	 * Obtem a ID do usuário atual
+	 */
 	public function getCurrentUserId()
 	{
 		return $_SESSION['user'];

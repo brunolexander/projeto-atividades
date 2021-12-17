@@ -255,7 +255,6 @@ class TaskService
 				$task->setContent($row['descricao']);
 				$task->setCreatedAt($row['criado_em']);
 				$task->setUpdatedAt($row['atualizado_em']);
-				$task->setExpiryAt($row['expira_em']);
 				$task->setStatus($row['finalizada']);
 
 				$user = new User();
