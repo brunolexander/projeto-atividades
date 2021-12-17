@@ -50,8 +50,10 @@ class CategoryCollection
 					$category->setId($row['id']);
 					$category->setName($row['nome']);
 
+
 					$collection[] = $category;
 				}
+
 			}
 
 			$result->free();

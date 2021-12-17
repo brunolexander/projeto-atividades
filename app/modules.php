@@ -45,12 +45,13 @@ $database = new \mysqli(
 	$config['socket']	
 );
 
+$database->query('SET CHARSET `utf8mb4`');
+
 $app->module(['database' => $database]);
 
 register_shutdown_function(function() use($database) {
 	$database->close();
 });
-
 
 unset($config);
 unset($database);

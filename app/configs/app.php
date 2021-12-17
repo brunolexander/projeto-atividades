@@ -25,7 +25,7 @@ return array(
 	'locale' => ['pt_BR', 'pt_BR.utf8', 'pt_BR.iso-8859-1', 'portuguese'],
 
 	# Modo de depuração
-	'debug' => true
+	'debug' => false
 );
 
 ?>

@@ -1,7 +1,40 @@
 <?php
 
+/**
+ * --------------------------------------------
+ * Manipular erros e exceções
+ * --------------------------------------------
+ * 
+ * Se o modo de depuração estiver ativo, mostramos uma página personalizada
+ * ao desenvolvedor. Caso não, apenas logamos os erros em um arquivo de texto
+ * e redirecionamos o cliente a uma página de erro.
+ */
+
+
+/**
+ * Inicia a memória temporária de saída.
+ * Assim que ocorrer um erro, podemos limpar qualquer conteúdo já
+ * existente e então mostrar uma página personalizada, sem precisarmos
+ * redirecionar o cliente.
+ */
+ob_start();
+
+
+register_shutdown_function(function() {
+	if (ob_get_status())
+	{
+		// Limpa a memória temporária, mas mantêm o conteúdo da página.
+		ob_end_flush();
+	}
+});
+
 function display_error_page($errno, $errstr, $errfile, $errline, $backtrace)
 {
+	if (ob_get_status())
+	{
+		// Limpa todo o conteúdo existente na página
+		ob_end_clean();
+	}
 
 ?>
 
@@ -111,7 +144,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	{
 		// Mostrar erro ao desenvolvedor
 
-		$backtrace = print_r(debug_backtrace(0));
+		$backtrace = print_r(debug_backtrace(0), true);
 
 		display_error_page($errno, $errstr, $errfile, $errline, $backtrace);
 	}
@@ -119,7 +152,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 	{
 		// Logar erro para arquivo /logs/error_<ano><mês><dia>
 
-		$filename = '/logs/error_' . date('Ymd');
+		$filename = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'logs/error_' . date('Ymd') . '.txt';
 
 		$content = sprintf('[%s] %s em %s na linha %d; erro número %d', 
 			date('H:i:s'), $errstr, $errfile, $errline, $errno);
@@ -146,11 +179,17 @@ set_exception_handler(function($exception) {
 	}
 	else
 	{
+		if (ob_get_status())
+		{
+			ob_end_clean();
+		}
+
 		// Mostrar página de erro ao usuário
 		include __DIR__ . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '500.php';
 	}
 	
 	return true;
 });
+
 
 ?>

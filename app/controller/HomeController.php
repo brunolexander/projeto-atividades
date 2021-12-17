@@ -35,7 +35,7 @@ class HomeController extends Controller
 		else
 		{
 			app()->module('router')->redirect('login');
-		}
+		}		
 	}
 
 	public function login()
